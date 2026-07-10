@@ -67,6 +67,7 @@ java/
 │   │   └── event/
 │   ├── repository/ # interface
 │   ├── client/ # interface
+│   ├── exception/ # ドメインに関わるexception
 │   ├── service/ # domain service
 │   ├── factory/
 │   └── specification/
