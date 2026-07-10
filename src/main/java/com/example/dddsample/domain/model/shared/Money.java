@@ -49,4 +49,14 @@ public record Money(BigDecimal amount, String currency) {
         }
         return new Money(this.amount.add(other.amount), this.currency);
     }
+
+    /**
+     * 金額に数量を乗算する。
+     *
+     * @param quantity 乗数
+     * @return 乗算結果
+     */
+    public Money multiply(final int quantity) {
+        return new Money(this.amount.multiply(BigDecimal.valueOf(quantity)), this.currency);
+    }
 }
