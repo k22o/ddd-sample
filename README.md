@@ -60,11 +60,7 @@ java/
 │   └── dto/ # domainをpresentationに渡すためにdtoを利用
 │
 ├── domain/
-│   ├── model/
-│   │   ├── entity/
-│   │   ├── valueobject/
-│   │   ├── aggregate/
-│   │   └── event/
+│   ├── model/ (entity,valueobject,aggregate,event)
 │   ├── repository/ # interface
 │   ├── client/ # interface
 │   ├── exception/ # ドメインに関わるexception
