@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.dddsample.infrastructure.db.mapper.OrderMapper">
+
+    <select id="findById" resultType="com.example.dddsample.infrastructure.db.record.OrderRecord">
+        SELECT id, customer_id, status, total_amount, total_currency,
+               postal_code, prefecture, city, street, payment_id, created_at
+        FROM orders
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByCustomerId" resultType="com.example.dddsample.infrastructure.db.record.OrderRecord">
+        SELECT id, customer_id, status, total_amount, total_currency,
+               postal_code, prefecture, city, street, payment_id, created_at
+        FROM orders
+        WHERE customer_id = #{customerId}
+    </select>
+
+    <insert id="insert" parameterType="com.example.dddsample.infrastructure.db.record.OrderRecord">
+        INSERT INTO orders (
+            id, customer_id, status, total_amount, total_currency,
+            postal_code, prefecture, city, street, payment_id, created_at, updated_at
+        ) VALUES (
+            #{id}, #{customerId}, #{status}, #{totalAmount}, #{totalCurrency},
+            #{postalCode}, #{prefecture}, #{city}, #{street}, #{paymentId}, #{createdAt}, CURRENT_TIMESTAMP
+        )
+    </insert>
+
+    <update id="updateStatusAndPayment">
+        UPDATE orders
+        SET status = #{status}, payment_id = #{paymentId}, updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+</mapper>

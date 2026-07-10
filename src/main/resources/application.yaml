@@ -2,6 +2,11 @@ spring:
   application:
     name: ddd-sample
 
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
 client:
   payment:
     base-url: http://localhost:9001

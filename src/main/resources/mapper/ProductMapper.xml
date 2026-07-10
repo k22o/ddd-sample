@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.dddsample.infrastructure.db.mapper.ProductMapper">
+
+    <select id="findById" resultType="com.example.dddsample.infrastructure.db.record.ProductRecord">
+        SELECT id, name, price_amount, price_currency, description
+        FROM products
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByIds" resultType="com.example.dddsample.infrastructure.db.record.ProductRecord">
+        SELECT id, name, price_amount, price_currency, description
+        FROM products
+        WHERE id IN
+        <foreach collection="ids" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </select>
+
+</mapper>
