@@ -1,6 +1,6 @@
 # 実装進捗ログ
 
-最終更新: 2026-07-10
+最終更新: 2026-07-11
 
 ---
 
@@ -40,39 +40,47 @@
 ### config層
 - [x] `config/RestClientConfig.java`
 
+### domain層
+- [x] `domain/model/shared/Address.java` — Value Object
+- [x] `domain/model/order/OrderId.java` — Value Object
+- [x] `domain/model/order/OrderItemId.java` — Value Object
+- [x] `domain/model/order/OrderStatus.java` — Enum
+- [x] `domain/model/order/OrderItem.java` — 集約内Entity
+- [x] `domain/model/order/Order.java` — 集約ルート
+- [x] `domain/model/customer/Customer.java` — 集約
+- [x] `domain/model/product/Product.java` — 集約
+- [x] `domain/repository/OrderRepository.java` — interface
+- [x] `domain/repository/CustomerRepository.java` — interface
+- [x] `domain/repository/ProductRepository.java` — interface
+- [x] `domain/exception/OrderNotFoundException.java`
+- [x] `domain/exception/CustomerNotFoundException.java`
+- [x] `domain/exception/ProductNotFoundException.java`
+- [x] `domain/model/shared/Money.java` — `multiply(int)` を追加（小計計算用）
+
+### infrastructure層（DB）
+- [x] `build.gradle` — MyBatis・H2依存追加
+- [x] `application.yaml` — H2・MyBatis設定追加
+- [x] `src/main/resources/schema.sql` — テーブル定義
+- [x] `infrastructure/db/record/OrderRecord.java`
+- [x] `infrastructure/db/record/OrderItemRecord.java`
+- [x] `infrastructure/db/record/CustomerRecord.java`
+- [x] `infrastructure/db/record/ProductRecord.java`
+- [x] `infrastructure/db/mapper/OrderMapper.java` — MyBatis @Mapper
+- [x] `infrastructure/db/mapper/OrderItemMapper.java` — MyBatis @Mapper
+- [x] `infrastructure/db/mapper/CustomerMapper.java` — MyBatis @Mapper
+- [x] `infrastructure/db/mapper/ProductMapper.java` — MyBatis @Mapper
+- [x] `infrastructure/db/repository/OrderRepositoryImpl.java`
+- [x] `infrastructure/db/repository/CustomerRepositoryImpl.java`
+- [x] `infrastructure/db/repository/ProductRepositoryImpl.java`
+
+> 注: このサンドボックス環境にはJDKが導入されておらず、`./gradlew compileJava` によるビルド確認は未実施。ローカル環境での確認を推奨。
+
 ---
 
 ## 残タスク
 
 ### domain層
-- [ ] `domain/model/shared/Address.java` — Value Object
-- [ ] `domain/model/order/OrderId.java` — Value Object
-- [ ] `domain/model/order/OrderItemId.java` — Value Object
-- [ ] `domain/model/order/OrderStatus.java` — Enum
-- [ ] `domain/model/order/OrderItem.java` — 集約内Entity
-- [ ] `domain/model/order/Order.java` — 集約ルート
-- [ ] `domain/model/customer/Customer.java` — 集約
-- [ ] `domain/model/product/Product.java` — 集約
-- [ ] `domain/repository/OrderRepository.java` — interface
-- [ ] `domain/repository/CustomerRepository.java` — interface
-- [ ] `domain/repository/ProductRepository.java` — interface
 - [ ] `domain/service/OrderDomainService.java` — 在庫確認・決済の調整
-
-### infrastructure層（DB）
-- [ ] `build.gradle` — MyBatis・H2依存追加
-- [ ] `application.yaml` — H2・MyBatis設定追加
-- [ ] `src/main/resources/schema.sql` — テーブル定義
-- [ ] `infrastructure/db/record/OrderRecord.java`
-- [ ] `infrastructure/db/record/OrderItemRecord.java`
-- [ ] `infrastructure/db/record/CustomerRecord.java`
-- [ ] `infrastructure/db/record/ProductRecord.java`
-- [ ] `infrastructure/db/mapper/OrderMapper.java` — MyBatis @Mapper
-- [ ] `infrastructure/db/mapper/OrderItemMapper.java` — MyBatis @Mapper
-- [ ] `infrastructure/db/mapper/CustomerMapper.java` — MyBatis @Mapper
-- [ ] `infrastructure/db/mapper/ProductMapper.java` — MyBatis @Mapper
-- [ ] `infrastructure/db/repository/OrderRepositoryImpl.java`
-- [ ] `infrastructure/db/repository/CustomerRepositoryImpl.java`
-- [ ] `infrastructure/db/repository/ProductRepositoryImpl.java`
 
 ### application層
 - [ ] `application/dto/PlaceOrderDto.java`
