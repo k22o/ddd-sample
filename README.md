@@ -13,6 +13,7 @@
     - Value Object: 変化することのない値、属性が同じなら同一
     - Entity: 変化しうる値、属性が同じでも一緒とは限らない (e.g. 人名)
     - Domain Service: ドメインを操作するもの。valueやentity内に含めるのがおかしい場合に作成
+    - aggregate: 関連するオブジェクト群を 1 つのユニットとして管理する
     - factory: ドメインを生成するための役割をもったもの。ドメインの生成が複雑な場合に利用する。
     - specification: オブジェクトの評価を行うオブジェクト。serviceなどに書くと流れがわからなくなる場合に利用。
 - InfraStructure:
