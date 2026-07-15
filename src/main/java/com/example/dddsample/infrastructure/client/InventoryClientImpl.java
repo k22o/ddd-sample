@@ -7,7 +7,6 @@ import com.example.dddsample.domain.model.shared.Quantity;
 import com.example.dddsample.infrastructure.client.dto.InventoryReserveRequest;
 import com.example.dddsample.infrastructure.client.dto.InventoryReserveResponse;
 import com.example.dddsample.infrastructure.client.dto.InventoryStockResponse;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -20,12 +19,15 @@ import java.util.Objects;
  * {@link InventoryClient} の実装クラス。外部在庫管理サービスへHTTPリクエストを送信する。
  */
 @Component
-@RequiredArgsConstructor
 @NullMarked
 public class InventoryClientImpl implements InventoryClient {
 
-    @Qualifier("inventoryRestClient")
     private final RestClient restClient;
+
+    // LombokとQualifierの相性の問題で、コンストラクタをちゃんと書く
+    public InventoryClientImpl(@Qualifier("inventoryRestClient") final RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     /**
      * {@inheritDoc}

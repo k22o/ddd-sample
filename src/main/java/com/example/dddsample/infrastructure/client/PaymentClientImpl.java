@@ -6,7 +6,6 @@ import com.example.dddsample.domain.model.customer.CustomerId;
 import com.example.dddsample.domain.model.shared.Money;
 import com.example.dddsample.infrastructure.client.dto.PaymentRequest;
 import com.example.dddsample.infrastructure.client.dto.PaymentResponse;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -19,12 +18,15 @@ import java.util.Objects;
  * {@link PaymentClient} の実装クラス。外部決済サービスへHTTPリクエストを送信する。
  */
 @Component
-@RequiredArgsConstructor
 @NullMarked
 public class PaymentClientImpl implements PaymentClient {
 
-    @Qualifier("paymentRestClient")
     private final RestClient restClient;
+
+    // LombokとQualifierの相性の問題で、コンストラクタをちゃんと書く
+    public PaymentClientImpl(@Qualifier("paymentRestClient") final RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     /**
      * {@inheritDoc}
