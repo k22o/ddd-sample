@@ -42,6 +42,9 @@ public class ProductRepositoryImpl implements ProductRepository {
      */
     @Override
     public List<Product> findByIds(final List<ProductId> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
         final List<String> rawIds = ids.stream().map(ProductId::value).toList();
         return productMapper.findByIds(rawIds).stream().map(this::toDomain).toList();
     }

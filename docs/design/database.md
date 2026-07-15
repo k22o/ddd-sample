@@ -107,3 +107,4 @@ CREATE TABLE order_items (
 - `order_items.product_name` / `unit_price_amount` は注文時点の値をスナップショット保存する。商品情報が後から変更されても注文内容が変わらないようにするため。
 - `orders.payment_id` は注文確定時に外部決済サービスから払い出されるIDを保存する。キャンセル時の決済取消に使用する。
 - IDはすべてUUID（アプリケーション側で生成）。
+- `customers` テーブルへの登録経路は本サンプルのスコープ外とする。ユースケース（UC-1〜UC-3、`docs/design/overview.md`参照）は顧客登録を含まず、`CustomerRepository`も`findById`のみを提供する。そのため`created_at`が`NOT NULL`であっても、顧客登録UseCaseやレコード投入APIは実装しない。動作確認・テスト用のレコードは`schema.sql`とは別に、テストコード内やDBシーディング手段で直接投入する前提とする。将来、顧客登録UC（サインアップ等）を追加する場合は、その時点で`CustomerRepository#save`とマッパーのINSERT定義を追加する。

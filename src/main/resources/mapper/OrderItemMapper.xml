@@ -9,6 +9,16 @@
         WHERE order_id = #{orderId}
     </select>
 
+    <select id="findByOrderIds" resultType="com.example.dddsample.infrastructure.db.record.OrderItemRecord">
+        SELECT id, order_id, product_id, product_name,
+               unit_price_amount, unit_price_currency, quantity
+        FROM order_items
+        WHERE order_id IN
+        <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </select>
+
     <insert id="insertAll">
         INSERT INTO order_items (
             id, order_id, product_id, product_name,

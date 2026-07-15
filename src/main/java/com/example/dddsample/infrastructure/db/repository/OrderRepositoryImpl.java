@@ -18,10 +18,13 @@ import com.example.dddsample.infrastructure.db.record.OrderItemRecord;
 import com.example.dddsample.infrastructure.db.record.OrderRecord;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * {@link OrderRepository} の実装クラス。{@code orders} と {@code order_items} の2テーブルを
@@ -55,27 +58,37 @@ public class OrderRepositoryImpl implements OrderRepository {
      */
     @Override
     public List<Order> findByCustomerId(final CustomerId customerId) {
-        return orderMapper.findByCustomerId(customerId.value()).stream()
-                .map(record -> toDomain(record, orderItemMapper.findByOrderId(record.id())))
+        final List<OrderRecord> orderRecords = orderMapper.findByCustomerId(customerId.value());
+        if (orderRecords.isEmpty()) {
+            return List.of();
+        }
+        final List<String> orderIds = orderRecords.stream().map(OrderRecord::id).toList();
+        final Map<String, List<OrderItemRecord>> itemRecordsByOrderId =
+                orderItemMapper.findByOrderIds(orderIds).stream()
+                        .collect(Collectors.groupingBy(OrderItemRecord::orderId));
+        return orderRecords.stream()
+                .map(record -> toDomain(
+                        record, itemRecordsByOrderId.getOrDefault(record.id(), List.of())))
                 .toList();
     }
 
     /**
      * {@inheritDoc}
      *
-     * <p>注文IDが未登録であれば注文明細を含めて新規登録し、登録済みであればステータスと支払いIDのみ更新する
-     * （注文明細は作成時から変更されない前提）。
+     * <p>注文IDでの新規登録を試み、一意制約違反（登録済み）であればステータスと支払いIDのみ更新する
+     * （注文明細は作成時から変更されない前提）。事前の存在確認を行わないことで、確認と登録の間に
+     * 割り込みが発生する競合状態（TOCTOU）を避けている。
      */
     @Override
     @Transactional
     public void save(final Order order) {
-        if (orderMapper.findById(order.id().value()) == null) {
+        try {
             orderMapper.insert(toOrderRecord(order));
             orderItemMapper.insertAll(
                     order.items().stream().map(item -> toOrderItemRecord(order.id(), item)).toList());
-            return;
+        } catch (final DuplicateKeyException e) {
+            orderMapper.updateStatusAndPayment(order.id().value(), order.status().name(), order.paymentId());
         }
-        orderMapper.updateStatusAndPayment(order.id().value(), order.status().name(), order.paymentId());
     }
 
     /**

@@ -1,6 +1,6 @@
 # 実装進捗ログ
 
-最終更新: 2026-07-11
+最終更新: 2026-07-15
 
 ---
 
@@ -74,6 +74,19 @@
 - [x] `infrastructure/db/repository/ProductRepositoryImpl.java`
 
 > 注: このサンドボックス環境にはJDKが導入されておらず、`./gradlew compileJava` によるビルド確認は未実施。ローカル環境での確認を推奨。
+
+### infrastructure層（DB）の改善 — コードレビュー指摘事項（2026-07-11）対応（2026-07-15）
+- [x] `ProductMapper#findByIds` に空リストを渡すとSQL構文エラーになる不具合を修正（`ProductRepositoryImpl#findByIds`に空リストガードを追加）
+- [x] `CustomerRepositoryImpl` / `OrderRepositoryImpl` / `ProductRepositoryImpl` および対応するMapperの単体テストを追加（`@MybatisTest`使用、`docs/guideline/unit-test.md`準拠でメソッド単位に`@Nested`グルーピング）
+  - `build.gradle` — `spring-boot-starter-test` と `mybatis-spring-boot-starter-test` を追加
+  - `infrastructure/db/mapper/*MapperTest.java`（Customer, Product, Order, OrderItem）
+  - `infrastructure/db/repository/*RepositoryImplTest.java`（Customer, Product, Order）
+- [x] `OrderRepositoryImpl#findByCustomerId` のN+1クエリを解消（`OrderItemMapper#findByOrderIds`を追加しIN句で一括取得、`Collectors.groupingBy`で注文ごとに紐付け）
+- [x] `OrderRepositoryImpl#save` のcheck-then-actによる競合状態（TOCTOU）を解消（事前の`findById`確認をやめ、`insert`を直接試みて`DuplicateKeyException`発生時に更新へフォールバックする方式に変更）
+- [x] `infrastructure/db/record/*Record.java` の行末コメントとJavadoc `@param` の重複を解消（行末コメントを削除しJavadocのみ残す）
+- [x] `customers.created_at NOT NULL` に対して顧客登録経路が未実装である点を設計として整理（`docs/design/database.md`に、本サンプルのユースケース（UC-1〜UC-3）が顧客登録を含まずスコープ外である旨を明記）
+
+> 注: 本サンドボックス環境にはJDKが導入されておらず、上記変更についても`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
 
 ---
 
