@@ -1,6 +1,6 @@
 # 実装進捗ログ
 
-最終更新: 2026-07-16（application層追加）
+最終更新: 2026-07-16（不足していた単体テストを追加）
 
 ---
 
@@ -102,6 +102,17 @@
 - [x] `application/usecase/ConfirmOrderUseCase.java` — UC-2: 注文取得 → `OrderDomainService#confirmOrder`（在庫確認・引当 → 決済） → 保存
 - [x] `application/usecase/GetOrderUseCase.java` — UC-3: 注文IDによる取得
 - [x] `application/usecase/PlaceOrderUseCaseTest.java` / `ConfirmOrderUseCaseTest.java` / `GetOrderUseCaseTest.java` — 各Repository/DomainServiceをモック化した単体テスト（`@Nested`で`Execute`にグルーピング）
+
+> 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
+
+### テストの追加（2026-07-16）— domain層モデル・infrastructure/clientにテストが無かったため追加
+- [x] `domain/model/shared/MoneyTest.java` / `QuantityTest.java` / `AddressTest.java` — Value Objectのバリデーションと演算（`add`/`multiply`）
+- [x] `domain/model/customer/CustomerIdTest.java` / `CustomerTest.java`
+- [x] `domain/model/product/ProductIdTest.java` / `ProductTest.java`
+- [x] `domain/model/order/OrderIdTest.java` / `OrderItemIdTest.java` / `OrderItemTest.java`
+- [x] `domain/model/order/OrderTest.java` — `create`/`confirm`/`cancel`の状態遷移とガード条件
+- [x] `application/dto/OrderResultDtoTest.java` — `Order`集約からの`from`変換ロジック
+- [x] `infrastructure/client/PaymentClientImplTest.java` / `InventoryClientImplTest.java` — `MockRestServiceServer`で外部APIとのHTTP通信をモック化して検証
 
 > 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
 
