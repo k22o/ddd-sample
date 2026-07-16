@@ -1,6 +1,6 @@
 # 実装進捗ログ
 
-最終更新: 2026-07-15
+最終更新: 2026-07-16
 
 ---
 
@@ -88,12 +88,15 @@
 
 > 注: 本サンドボックス環境にはJDKが導入されておらず、上記変更についても`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
 
+### domain層（2026-07-16）
+- [x] `domain/service/OrderDomainService.java` — 在庫確認・引当 → 決済 → `Order#confirm` による確定。在庫不足・決済失敗時は、それまでに引き当てた在庫を`InventoryClient#cancelReservation`で補償ロールバックする
+- [x] `domain/service/OrderDomainServiceTest.java` — `InventoryClient`/`PaymentClient`をモック化した単体テスト（`@Nested`でメソッド単位グルーピング）。正常系・在庫不足時のロールバック・決済失敗時のロールバックを検証
+
+> 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
+
 ---
 
 ## 残タスク
-
-### domain層
-- [ ] `domain/service/OrderDomainService.java` — 在庫確認・決済の調整
 
 ### application層
 - [ ] `application/dto/PlaceOrderDto.java`
