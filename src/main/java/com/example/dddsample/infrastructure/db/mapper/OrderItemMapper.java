@@ -23,6 +23,14 @@ public interface OrderItemMapper {
     List<OrderItemRecord> findByOrderId(@Param("orderId") String orderId);
 
     /**
+     * 複数の注文IDに紐づく明細レコード一覧を一括取得する。
+     *
+     * @param orderIds 注文IDのリスト
+     * @return レコード一覧
+     */
+    List<OrderItemRecord> findByOrderIds(@Param("orderIds") List<String> orderIds);
+
+    /**
      * 注文明細レコードを一括登録する。
      *
      * @param records 登録対象のレコード一覧
