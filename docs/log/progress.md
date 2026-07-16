@@ -1,6 +1,6 @@
 # 実装進捗ログ
 
-最終更新: 2026-07-16
+最終更新: 2026-07-16（application層追加）
 
 ---
 
@@ -94,17 +94,20 @@
 
 > 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
 
+### application層（2026-07-16）
+- [x] `application/dto/OrderItemDto.java` — 注文明細の入力Dto（productId, quantity）
+- [x] `application/dto/PlaceOrderDto.java` — 注文作成の入力Dto（customerId, shippingAddress, items）
+- [x] `application/dto/OrderResultDto.java` — 注文処理結果Dto。`Order`集約から`from(Order)`で組み立て（ネストした`Item`が明細を表現）。3つのUseCaseすべての戻り値として共通利用
+- [x] `application/usecase/PlaceOrderUseCase.java` — UC-1: 顧客・商品の存在確認 → 商品情報のスナップショットで`OrderItem`生成 → `Order.create` → 保存
+- [x] `application/usecase/ConfirmOrderUseCase.java` — UC-2: 注文取得 → `OrderDomainService#confirmOrder`（在庫確認・引当 → 決済） → 保存
+- [x] `application/usecase/GetOrderUseCase.java` — UC-3: 注文IDによる取得
+- [x] `application/usecase/PlaceOrderUseCaseTest.java` / `ConfirmOrderUseCaseTest.java` / `GetOrderUseCaseTest.java` — 各Repository/DomainServiceをモック化した単体テスト（`@Nested`で`Execute`にグルーピング）
+
+> 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
+
 ---
 
 ## 残タスク
-
-### application層
-- [ ] `application/dto/PlaceOrderDto.java`
-- [ ] `application/dto/OrderItemDto.java`
-- [ ] `application/dto/OrderResultDto.java`
-- [ ] `application/usecase/PlaceOrderUseCase.java` — UC-1: 注文作成
-- [ ] `application/usecase/ConfirmOrderUseCase.java` — UC-2: 注文確定
-- [ ] `application/usecase/GetOrderUseCase.java` — UC-3: 注文取得
 
 ### presentation層
 - [ ] `presentation/request/PlaceOrderRequest.java`
