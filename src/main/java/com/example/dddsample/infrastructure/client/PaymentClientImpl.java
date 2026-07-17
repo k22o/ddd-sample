@@ -6,6 +6,7 @@ import com.example.dddsample.domain.model.customer.CustomerId;
 import com.example.dddsample.domain.model.shared.Money;
 import com.example.dddsample.infrastructure.client.dto.PaymentRequest;
 import com.example.dddsample.infrastructure.client.dto.PaymentResponse;
+import com.google.common.annotations.VisibleForTesting;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
@@ -37,6 +38,22 @@ public class PaymentClientImpl implements PaymentClient {
      */
     @Override
     public String charge(final CustomerId customerId, final Money amount) {
+        // データを取得する
+        final PaymentResponse response = fetchPayment(customerId, amount);
+        // ドメイン (というか必要な型) に変更する
+        return toPaymentId(response);
+    }
+
+    /**
+     * 決済APIを呼び出し、レスポンスボディをそのまま取得する。
+     *
+     * @param customerId 決済対象の顧客ID
+     * @param amount 決済金額
+     * @return 決済APIのレスポンス
+     * @throws PaymentFailedException 外部決済サービスがエラーを返した場合
+     */
+    @VisibleForTesting
+    PaymentResponse fetchPayment(final CustomerId customerId, final Money amount) {
         final PaymentRequest request = new PaymentRequest(
                 customerId.value(),
                 amount.amount(),
@@ -52,7 +69,17 @@ public class PaymentClientImpl implements PaymentClient {
                 })
                 .body(PaymentResponse.class);
 
-        return Objects.requireNonNull(response, "決済APIのレスポンスボディが空です").paymentId();
+        return Objects.requireNonNull(response, "決済APIのレスポンスボディが空です");
+    }
+
+    /**
+     * 決済APIのレスポンスを、決済IDへ変換する。
+     *
+     * @param response 決済APIのレスポンス
+     * @return 決済ID
+     */
+    private String toPaymentId(final PaymentResponse response) {
+        return response.paymentId();
     }
 
     /**
