@@ -1,5 +1,6 @@
 package com.example.dddsample.infrastructure.client;
 
+import com.example.dddsample.TestUtil;
 import com.example.dddsample.domain.exception.PaymentFailedException;
 import com.example.dddsample.domain.model.customer.CustomerId;
 import com.example.dddsample.domain.model.shared.Money;
@@ -28,6 +29,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @SuppressWarnings({"NonAsciiCharacters"})
 class PaymentClientImplTest {
 
+    private static final String RESOURCE_DIR = "infrastructure/client/payment/";
+
     private MockRestServiceServer server;
 
     private PaymentClientImpl paymentClient;
@@ -54,7 +57,8 @@ class PaymentClientImplTest {
                     .andExpect(jsonPath("$.customerId").value("customer-1"))
                     .andExpect(jsonPath("$.amount").value(2000))
                     .andExpect(jsonPath("$.currency").value("JPY"))
-                    .andRespond(withSuccess("{\"paymentId\":\"payment-1\",\"status\":\"SUCCESS\"}", MediaType.APPLICATION_JSON));
+                    .andRespond(withSuccess(
+                            TestUtil.readJson(RESOURCE_DIR + "charge-success-response.json"), MediaType.APPLICATION_JSON));
 
             final String paymentId = paymentClient.charge(
                     new CustomerId("customer-1"), new Money(new BigDecimal("2000"), "JPY"));
