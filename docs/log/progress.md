@@ -1,6 +1,6 @@
 # 実装進捗ログ
 
-最終更新: 2026-07-16（不足していた単体テストを追加）
+最終更新: 2026-07-16（presentation層を実装）
 
 ---
 
@@ -116,14 +116,23 @@
 
 > 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。
 
+### presentation層（2026-07-16）
+- [x] `presentation/request/OrderItemRequest.java` — 注文明細のリクエストDto。`toDto()`で`OrderItemDto`に変換
+- [x] `presentation/request/PlaceOrderRequest.java` — 注文作成のリクエストDto（`shippingAddress`はドメインの`Address`をそのまま利用）。`toDto()`で`PlaceOrderDto`に変換
+- [x] `presentation/response/OrderResponse.java` — 注文情報のレスポンスDto。`OrderResultDto`から`from()`で組み立て、注文作成（201）・注文取得（200）の両方で共通利用
+- [x] `presentation/response/OrderConfirmResponse.java` — 注文確定のレスポンスDto（orderId/status/paymentIdのみ）
+- [x] `presentation/controller/OrderController.java` — `/api/v1/orders`。`POST /`（作成・201）、`POST /{orderId}/confirm`（確定）、`GET /{orderId}`（取得）の3エンドポイント
+- [x] `presentation/exception/GlobalExceptionHandler.java` — `@RestControllerAdvice` + `ProblemDetail`でドメイン例外をHTTPステータスに変換（NotFound系→404、在庫不足→409、決済失敗→402、`IllegalArgumentException`→400）
+- [x] 各クラスの単体テストを追加
+  - `presentation/request/*RequestTest.java`（変換ロジックの純粋な単体テスト）
+  - `presentation/response/*ResponseTest.java`（変換ロジックの純粋な単体テスト）
+  - `presentation/exception/GlobalExceptionHandlerTest.java`（Springコンテキストを使わずハンドラメソッドを直接呼び出して検証）
+  - `presentation/controller/OrderControllerTest.java`（`@WebMvcTest` + `@MockitoBean`でユースケースをモック化し、`GlobalExceptionHandler`によるエラーレスポンス変換も含めて検証）
+
+> 注: 本サンドボックス環境にはJDKが導入されておらず、`./gradlew test`によるビルド・テスト実行確認は未実施。ローカル環境での確認を推奨。特に`@WebMvcTest`はSpring Boot 4系での動作実績がこのプロジェクトに無いため、ローカルでの実行確認を強く推奨。
+
 ---
 
 ## 残タスク
 
-### presentation層
-- [ ] `presentation/request/PlaceOrderRequest.java`
-- [ ] `presentation/request/OrderItemRequest.java`
-- [ ] `presentation/response/OrderResponse.java`
-- [ ] `presentation/response/OrderConfirmResponse.java`
-- [ ] `presentation/controller/OrderController.java`
-- [ ] `presentation/exception/GlobalExceptionHandler.java`
+特になし（設計で定義した全レイヤーの実装が完了）。
