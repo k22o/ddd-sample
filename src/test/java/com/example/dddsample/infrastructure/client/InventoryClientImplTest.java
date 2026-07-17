@@ -4,6 +4,8 @@ import com.example.dddsample.TestUtil;
 import com.example.dddsample.domain.exception.InsufficientStockException;
 import com.example.dddsample.domain.model.product.ProductId;
 import com.example.dddsample.domain.model.shared.Quantity;
+import com.example.dddsample.infrastructure.client.dto.InventoryReserveResponse;
+import com.example.dddsample.infrastructure.client.dto.InventoryStockResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -73,6 +75,24 @@ class InventoryClientImplTest {
     }
 
     @Nested
+    class FetchStock {
+
+        @Test
+        void 在庫確認APIのレスポンスをそのまま取得する() {
+            server.expect(requestTo("/inventory/product-1?quantity=2"))
+                    .andExpect(method(HttpMethod.GET))
+                    .andRespond(withSuccess(
+                            TestUtil.readJson(RESOURCE_DIR + "check-stock-available-response.json"), MediaType.APPLICATION_JSON));
+
+            final InventoryStockResponse response = inventoryClient.fetchStock(new ProductId("product-1"), new Quantity(2));
+
+            assertThat(response.productId()).isEqualTo("product-1");
+            assertThat(response.available()).isTrue();
+            assertThat(response.stock()).isEqualTo(10);
+        }
+    }
+
+    @Nested
     class Reserve {
 
         @Test
@@ -94,6 +114,32 @@ class InventoryClientImplTest {
             server.expect(requestTo("/inventory/reservations")).andRespond(withServerError());
 
             assertThatThrownBy(() -> inventoryClient.reserve(new ProductId("product-1"), new Quantity(2)))
+                    .isInstanceOf(InsufficientStockException.class);
+        }
+    }
+
+    @Nested
+    class FetchReservation {
+
+        @Test
+        void 在庫予約APIのレスポンスをそのまま取得する() {
+            server.expect(requestTo("/inventory/reservations"))
+                    .andExpect(method(HttpMethod.POST))
+                    .andRespond(withSuccess(
+                            TestUtil.readJson(RESOURCE_DIR + "reserve-success-response.json"), MediaType.APPLICATION_JSON));
+
+            final InventoryReserveResponse response = inventoryClient.fetchReservation(new ProductId("product-1"), new Quantity(2));
+
+            assertThat(response.reservationId()).isEqualTo("reservation-1");
+            assertThat(response.productId()).isEqualTo("product-1");
+            assertThat(response.quantity()).isEqualTo(2);
+        }
+
+        @Test
+        void 在庫管理サービスが在庫不足を返すとInsufficientStockExceptionをスローする() {
+            server.expect(requestTo("/inventory/reservations")).andRespond(withServerError());
+
+            assertThatThrownBy(() -> inventoryClient.fetchReservation(new ProductId("product-1"), new Quantity(2)))
                     .isInstanceOf(InsufficientStockException.class);
         }
     }
