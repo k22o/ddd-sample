@@ -7,10 +7,13 @@ import com.example.dddsample.application.usecase.PlaceOrderUseCase;
 import com.example.dddsample.presentation.request.PlaceOrderRequest;
 import com.example.dddsample.presentation.response.OrderConfirmResponse;
 import com.example.dddsample.presentation.response.OrderResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
+@Validated
 @NullMarked
 public class OrderController {
 
@@ -40,7 +44,7 @@ public class OrderController {
      * @return 作成された注文（{@code 201 Created}）
      */
     @PostMapping
-    public ResponseEntity<OrderResponse> placeOrder(@RequestBody final PlaceOrderRequest request) {
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody final PlaceOrderRequest request) {
         final OrderResultDto result = placeOrderUseCase.execute(request.toDto());
         return ResponseEntity.status(HttpStatus.CREATED).body(OrderResponse.from(result));
     }
@@ -52,7 +56,8 @@ public class OrderController {
      * @return 確定後の注文
      */
     @PostMapping("/{orderId}/confirm")
-    public OrderConfirmResponse confirmOrder(@PathVariable final String orderId) {
+    public OrderConfirmResponse confirmOrder(
+            @PathVariable @NotBlank(message = "注文IDは必須です") final String orderId) {
         final OrderResultDto result = confirmOrderUseCase.execute(orderId);
         return OrderConfirmResponse.from(result);
     }
@@ -64,7 +69,7 @@ public class OrderController {
      * @return 注文
      */
     @GetMapping("/{orderId}")
-    public OrderResponse getOrder(@PathVariable final String orderId) {
+    public OrderResponse getOrder(@PathVariable @NotBlank(message = "注文IDは必須です") final String orderId) {
         final OrderResultDto result = getOrderUseCase.execute(orderId);
         return OrderResponse.from(result);
     }

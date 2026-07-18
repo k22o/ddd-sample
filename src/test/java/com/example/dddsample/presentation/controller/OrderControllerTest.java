@@ -96,6 +96,27 @@ class OrderControllerTest {
                     .andExpect(jsonPath("$.totalAmount.amount").value(2000))
                     .andExpect(jsonPath("$.items[0].productName").value("商品A"));
         }
+
+        @Test
+        void 注文明細が空の場合は400を返す() throws Exception {
+            final String requestBody = """
+                    {
+                      "customerId": "customer-1",
+                      "shippingAddress": {
+                        "postalCode": "100-0001",
+                        "prefecture": "東京都",
+                        "city": "千代田区",
+                        "street": "1-1-1"
+                      },
+                      "items": []
+                    }
+                    """;
+
+            mockMvc.perform(post("/api/v1/orders")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(requestBody))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
     @Nested
@@ -129,6 +150,12 @@ class OrderControllerTest {
             mockMvc.perform(post("/api/v1/orders/{orderId}/confirm", "order-1"))
                     .andExpect(status().isConflict());
         }
+
+        @Test
+        void 注文IDが空白の場合は400を返す() throws Exception {
+            mockMvc.perform(post("/api/v1/orders/{orderId}/confirm", " "))
+                    .andExpect(status().isBadRequest());
+        }
     }
 
     @Nested
@@ -150,6 +177,12 @@ class OrderControllerTest {
 
             mockMvc.perform(get("/api/v1/orders/{orderId}", "unknown"))
                     .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void 注文IDが空白の場合は400を返す() throws Exception {
+            mockMvc.perform(get("/api/v1/orders/{orderId}", " "))
+                    .andExpect(status().isBadRequest());
         }
     }
 }
