@@ -7,8 +7,14 @@ import com.example.dddsample.domain.exception.PaymentFailedException;
 import com.example.dddsample.domain.exception.ProductNotFoundException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -83,5 +89,28 @@ class GlobalExceptionHandlerTest {
             assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
             assertThat(problemDetail.getDetail()).isEqualTo("不正な値です");
         }
+    }
+
+    @Nested
+    class HandleValidationError {
+
+        @Test
+        void MethodArgumentNotValidExceptionを400に変換する() throws NoSuchMethodException {
+            final BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "placeOrderRequest");
+            bindingResult.addError(new FieldError("placeOrderRequest", "customerId", "顧客IDは必須です"));
+            final MethodParameter methodParameter = new MethodParameter(
+                    GlobalExceptionHandlerTest.class.getDeclaredMethod("dummy", String.class), 0);
+            final MethodArgumentNotValidException ex = new MethodArgumentNotValidException(methodParameter, bindingResult);
+
+            final ProblemDetail problemDetail = handler.handleValidationError(ex);
+
+            assertThat(problemDetail.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+            assertThat(problemDetail.getDetail()).isEqualTo("リクエストの内容が不正です");
+            assertThat(problemDetail.getProperties()).containsEntry("errors", Map.of("customerId", "顧客IDは必須です"));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private void dummy(final String value) {
     }
 }

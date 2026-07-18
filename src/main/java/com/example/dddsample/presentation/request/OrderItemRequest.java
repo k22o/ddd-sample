@@ -1,6 +1,8 @@
 package com.example.dddsample.presentation.request;
 
 import com.example.dddsample.application.dto.OrderItemDto;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -10,7 +12,9 @@ import org.jspecify.annotations.NullMarked;
  * @param quantity  数量
  */
 @NullMarked
-public record OrderItemRequest(String productId, int quantity) {
+public record OrderItemRequest(
+        @NotBlank(message = "商品IDは必須です") String productId,
+        @Positive(message = "数量は1以上である必要があります") int quantity) {
 
     /**
      * {@link OrderItemDto} に変換する。
