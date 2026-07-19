@@ -26,6 +26,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,7 +109,8 @@ class ConfirmOrderIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.orderId").value("order-1"))
                 .andExpect(jsonPath("$.status").value("CONFIRMED"))
-                .andExpect(jsonPath("$.paymentId").value("payment-1"));
+                .andExpect(jsonPath("$.paymentId").value("payment-1"))
+                .andExpect(header().string("Cache-Control", "private,no-store"));
 
         final Order confirmed = orderRepository.findById(new OrderId("order-1"));
         assertThat(confirmed.status()).isEqualTo(OrderStatus.CONFIRMED);
