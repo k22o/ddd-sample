@@ -17,6 +17,8 @@ mybatis:
     map-underscore-to-camel-case: true
 
 client:
+  connect-timeout: 1s
+  read-timeout: 1s
   payment:
     base-url: http://localhost:9001
   inventory:
