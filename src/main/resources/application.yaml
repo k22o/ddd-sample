@@ -23,3 +23,7 @@ client:
     base-url: http://localhost:9001
   inventory:
     base-url: http://localhost:9002
+
+logging:
+  level:
+    root: INFO

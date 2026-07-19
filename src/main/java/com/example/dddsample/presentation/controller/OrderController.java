@@ -7,13 +7,15 @@ import com.example.dddsample.application.usecase.PlaceOrderUseCase;
 import com.example.dddsample.presentation.request.PlaceOrderRequest;
 import com.example.dddsample.presentation.response.OrderConfirmResponse;
 import com.example.dddsample.presentation.response.OrderResponse;
+import java.util.concurrent.TimeUnit;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
-@Validated
 @NullMarked
 public class OrderController {
 
@@ -63,14 +64,17 @@ public class OrderController {
     }
 
     /**
-     * 注文を取得する（UC-3）。
+     * 注文を取得する（UC-3）。短時間のキャッシュを許容するため、{@code Cache-Control}に{@code max-age=30}を設定する。
      *
      * @param orderId 取得対象の注文ID
      * @return 注文
      */
     @GetMapping("/{orderId}")
-    public OrderResponse getOrder(@PathVariable @NotBlank(message = "注文IDは必須です") final String orderId) {
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable @NotBlank(message = "注文IDは必須です") final String orderId) {
         final OrderResultDto result = getOrderUseCase.execute(orderId);
-        return OrderResponse.from(result);
+        return ResponseEntity.ok()
+                // 本当はprivate no-storeがいいが、サンプル実装として、cache-controlを上書きしている
+                .cacheControl(CacheControl.maxAge(30, TimeUnit.SECONDS).cachePrivate())
+                .body(OrderResponse.from(result));
     }
 }

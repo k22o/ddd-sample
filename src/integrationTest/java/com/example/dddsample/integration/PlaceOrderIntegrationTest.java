@@ -22,6 +22,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -68,6 +69,7 @@ class PlaceOrderIntegrationTest {
                 .andExpect(jsonPath("$.status").value("PENDING"))
                 .andExpect(jsonPath("$.totalAmount.amount").value(2000))
                 .andExpect(jsonPath("$.items[0].productName").value("商品A"))
+                .andExpect(header().string("Cache-Control", "private,no-store"))
                 .andReturn();
 
         final String orderId = JsonPath.read(result.getResponse().getContentAsString(), "$.orderId");

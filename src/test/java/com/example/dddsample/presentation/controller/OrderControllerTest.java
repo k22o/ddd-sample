@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -168,7 +169,8 @@ class OrderControllerTest {
             mockMvc.perform(get("/api/v1/orders/{orderId}", "order-1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.orderId").value("order-1"))
-                    .andExpect(jsonPath("$.customerId").value("customer-1"));
+                    .andExpect(jsonPath("$.customerId").value("customer-1"))
+                    .andExpect(header().string("Cache-Control", "max-age=30, private"));
         }
 
         @Test
